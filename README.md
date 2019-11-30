@@ -2,7 +2,7 @@
 WIP - An implementation of rundown protection in rust. 
 
 
-Note: This tool is not created by, affiliated with, or supported by Microsoft/Azure DevOps.
+Note: This library is not created by, affiliated with, or supported by Microsoft.
 
 [![Build Status](https://travis-ci.org/bgianfo/rundown.svg?branch=master)](https://travis-ci.org/bgianfo/rundown)
 [![GitHub license](https://img.shields.io/github/license/bgianfo/rundown.svg)]()
