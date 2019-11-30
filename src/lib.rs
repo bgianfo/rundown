@@ -1,5 +1,7 @@
-
 mod guard;
+mod rundown_ref;
 
-mod rundown;
-
+// Expose the interface publicly.
+//
+pub use guard::RundownGuard;
+pub use rundown_ref::RundownRef;

@@ -1,4 +1,4 @@
-use crate::rundown::RundownRef;
+use crate::rundown_ref::RundownRef;
 
 /// An RAII implementation a "scoped lock" pattern, but specialized
 /// to the needs of run-down protection. When this structure is dropped
@@ -7,12 +7,18 @@ use crate::rundown::RundownRef;
 ///
 /// This structure is created by the [`try_acquire'] method on ['RundownRef'].
 ///
-pub struct RundownGuard {
-    rundown_ref: &'static mut RundownRef,
+pub struct RundownGuard<'a> {
+    rundown_ref: &'a RundownRef,
 }
 
-impl RundownGuard {
-    pub fn new(rundown_ref: &'static mut RundownRef) -> RundownGuard {
+impl<'rundown_ref> RundownGuard<'rundown_ref> {
+    pub fn new(rundown_ref: &'rundown_ref RundownRef) -> RundownGuard<'rundown_ref> {
         RundownGuard { rundown_ref }
+    }
+}
+
+impl<'rundown_ref> Drop for RundownGuard<'rundown_ref> {
+    fn drop(&mut self) {
+        self.rundown_ref.release()
     }
 }
