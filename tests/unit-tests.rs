@@ -2,7 +2,7 @@ use rundown::{RundownGuard, RundownRef, RundownError};
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use pretty_assertions::{assert_eq, assert_ne};
+use pretty_assertions::{assert_eq};
 
 #[macro_use]
 extern crate assert_impl;
