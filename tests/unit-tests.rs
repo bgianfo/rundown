@@ -4,7 +4,7 @@ use std::thread;
 use std::time::Duration;
 
 #[test]
-fn basic_usage() {
+fn test_acquisition_not_rundown() {
     let rr: RundownRef = RundownRef::new();
 
     let result = rr.try_acquire();
@@ -14,7 +14,17 @@ fn basic_usage() {
 }
 
 #[test]
-fn parallel_usage() {
+fn test_acquisition_already_rundown() {
+    let rr: RundownRef = RundownRef::new();
+
+    rr.wait_for_rundown();
+
+    let result = rr.try_acquire();
+    assert!(result.is_err());
+}
+
+#[test]
+fn test_usage_with_concurrency() {
     let rr = Arc::new(RundownRef::new());
 
     for _ in 0..20 {
@@ -25,15 +35,12 @@ fn parallel_usage() {
 
             match result {
                 Ok(_) => {
-                    println!("Got guard!");
                     thread::sleep(Duration::from_millis(10));
                 }
-                Err(_) => println!("Rundown in progress!"),
+                Err(_) => return ,
             }
         });
     }
 
-    println!("Waiting for rundown...");
     rr.wait_for_rundown();
-    println!("Rundown complete.");
 }
