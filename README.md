@@ -2,7 +2,7 @@
 
 An implementation of run-down protection in rust.
 
-Run-down protection is useful when you are attempting to re-initialize or destroy a shared resource.
+Run-down protection is useful when to re-initialize or destroy a shared resource in a [SMP][smp-link] runtime environment.
 
 The pattern has two parts, a means to guarantee the resource is accessible and remains so for
 the during of it's usage. As well as way to make the resource inaccessible from a point going forward
@@ -12,9 +12,8 @@ This crate was inspired by the [run-down protection primitive available in the N
 
 ## Usage example
 
-
 ````rust
-use rundown::{RundownGuard, RundownRef};
+use run_down::{RundownGuard, RundownRef};
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
@@ -57,12 +56,12 @@ fn example() {
 ## TODO
 
  - Add a more interesting real-world example.
+ 
+ - Expand the docs before publishing the crate.
 
  - Add some benchmarks to see if there is any opportunity to optimize the implementation.
 
 Note: This crate is not created by, affiliated with, or supported by Microsoft.
-
-
 
 
 <!-- Markdown References -->
@@ -76,3 +75,5 @@ Note: This crate is not created by, affiliated with, or supported by Microsoft.
 [dependabot-img]: https://api.dependabot.com/badges/status?host=github&repo=bgianfo/rundown
 
 [nt-run-down-docs]: https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/run-down-protection
+
+[smp-link]: https://en.wikipedia.org/wiki/Symmetric_multiprocessing
