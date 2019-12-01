@@ -6,18 +6,18 @@
     clippy::nursery,
     clippy::cargo
 )]
+
 // Disable warnings for things we don't care about.
 #![allow(unknown_lints)]
-/*
 #![allow(clippy::implicit_return)]
-#![allow(clippy::integer_arithmetic)]
-#![allow(clippy::print_stdout)]
+#![allow(clippy::missing_inline_in_public_items)]
+#![allow(clippy::multiple_inherent_impl)]
 #![allow(clippy::multiple_crate_versions)]
-#![allow(clippy::match_same_arms)]
+#![allow(clippy::module_name_repetitions)]
+
 // TODO: We should really fix these issues.
-#![allow(clippy::use_debug)]
 #![allow(clippy::missing_docs_in_private_items)]
-*/
+#![allow(clippy::integer_arithmetic)]
 
 #[macro_use]
 extern crate bitflags;

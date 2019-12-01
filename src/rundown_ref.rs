@@ -13,39 +13,39 @@ pub enum RundownError {
 
 bitflags! {
     struct RundownFlags: u64 {
-        const RUNDOWN_IN_PROGRESS = 0xF000000000000000;
+        const RUNDOWN_IN_PROGRESS = 0xF000_0000_0000_0000;
     }
 }
 
 impl RundownFlags {
     #[inline]
-    pub fn is_rundown_in_progress(&self) -> bool {
-        self.contains(RundownFlags::RUNDOWN_IN_PROGRESS)
+    pub const fn is_rundown_in_progress(self) -> bool {
+        self.contains(Self::RUNDOWN_IN_PROGRESS)
     }
 
     #[inline]
-    pub fn set_rundown_in_progress(&self) -> u64 {
-        self.bits | RundownFlags::RUNDOWN_IN_PROGRESS.bits
+    pub const fn set_rundown_in_progress(self) -> u64 {
+        self.bits | Self::RUNDOWN_IN_PROGRESS.bits
     }
 
     #[inline]
-    pub fn get_ref(&self) -> u64 {
-        self.bits & (!RundownFlags::RUNDOWN_IN_PROGRESS.bits)
+    pub const fn get_ref(self) -> u64 {
+        self.bits & (!Self::RUNDOWN_IN_PROGRESS.bits)
     }
 
     #[inline]
-    pub fn is_ref_zero(&self) -> bool {
+    pub const fn is_ref_zero(self) -> bool {
         self.get_ref() == 0
     }
 
     #[inline]
-    pub fn add_ref(&self) -> u64 {
-        return self.bits + 1;
+    pub const fn add_ref(self) -> u64 {
+        self.bits + 1
     }
 
     #[inline]
-    pub fn dec_ref(&self) -> u64 {
-        return self.bits - 1;
+    pub const fn dec_ref(self) -> u64 {
+        self.bits - 1
     }
 }
 
@@ -105,7 +105,7 @@ fn test_rundown_flags_set_in_progress() {
 }
 
 #[inline]
-fn to_flags(bits: u64) -> RundownFlags {
+const fn to_flags(bits: u64) -> RundownFlags {
     // To preserve the reference-count bits which are encoded with
     // the flags we need to use the unchecked version. This requires
     // the use of unsafe.
@@ -126,6 +126,7 @@ fn test_to_flags() {
     assert_eq!(true, flags.is_rundown_in_progress());
 }
 
+#[derive(Default)]
 pub struct RundownRef {
     ref_count: AtomicU64,
 
@@ -140,14 +141,11 @@ const ORDERING_VAL: Ordering = Ordering::SeqCst;
 impl RundownRef {
     /// Initializes a new ['RundownRef'].
     #[inline]
-    pub fn new() -> RundownRef {
-        RundownRef {
-            ref_count: AtomicU64::new(0),
-            event: Lazy::new(),
-        }
+    pub fn new() -> Self {
+        Self::default()
     }
 
-    /// Attempts to acquire rundown protection on this RundownRef,
+    /// Attempts to acquire rundown protection on this 'RundownRef',
     /// returns the ['RundownGuard'] which holds the refcount, or
     /// returns an error if the object is already being rundown.
     pub fn try_acquire(&self) -> Result<RundownGuard<'_>, RundownError> {
