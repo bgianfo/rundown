@@ -1,4 +1,4 @@
-# run-down [![Build Status][travis-ci-img]][travis-ci] [![GitHub license]()][license-img] [![Dependabot Status][dependabot-img]][dependabot]
+# run-down [![Build Status][travis-ci-img]][travis-ci] [![GitHub license][license-img][] [![Dependabot Status][dependabot-img]][dependabot]
 
 An implementation of run-down protection in rust.
 
