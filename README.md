@@ -1,4 +1,4 @@
-# run-down [![Build Status][travis-ci-img]][travis-ci] [![GitHub license][license-img][] [![Dependabot Status][dependabot-img]][dependabot]
+# run-down [![Build Status][travis-ci-img]][travis-ci] [![GitHub license][license-img]][license] [![Dependabot Status][dependabot-img]][dependabot]
 
 An implementation of run-down protection in rust.
 
@@ -69,6 +69,7 @@ Note: This crate is not created by, affiliated with, or supported by Microsoft.
 [travis-ci]: https://travis-ci.org/bgianfo/rundown
 [travis-ci-img]: https://travis-ci.org/bgianfo/rundown.svg?branch=master
 
+[license]:https://github.com/bgianfo/rundown/blob/master/LICENSE
 [license-img]: https://img.shields.io/github/license/bgianfo/rundown.svg
 
 [dependabot]: https://dependabot.com
