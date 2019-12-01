@@ -5,7 +5,7 @@ use std::result::Result;
 use std::sync::atomic::AtomicU64;
 use std::sync::atomic::Ordering;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum RundownError {
     /// The rundown reference is already in the middle of being rundown.
     RundownInProgress,
@@ -30,7 +30,7 @@ impl RundownFlags {
 
     #[inline]
     pub fn get_ref(&self) -> u64 {
-        self.bits ^ RundownFlags::RUNDOWN_IN_PROGRESS.bits
+        self.bits & (!RundownFlags::RUNDOWN_IN_PROGRESS.bits)
     }
 
     #[inline]
@@ -49,11 +49,81 @@ impl RundownFlags {
     }
 }
 
+//-------------------------------------------------------------------
+// Test: test_rundown_flags_refcount
+//
+// Description:
+//  A test case to validate that the reference counting
+//  facilities work correctly, namely add-ref and dec-ref.
+//
+#[test]
+fn test_rundown_flags_refcount() {
+    // Initialize an empty bit flags.
+    let mut flags = RundownFlags::empty();
+    assert_eq!(0, flags.get_ref());
+    assert_eq!(true, flags.is_ref_zero());
+
+    // Validate that add ref works.
+    flags = to_flags(flags.add_ref());
+    assert_eq!(1, flags.get_ref());
+    assert_eq!(false, flags.is_ref_zero());
+
+    // Validate that dec ref works.
+    flags = to_flags(flags.dec_ref());
+    assert_eq!(0, flags.get_ref());
+    assert_eq!(true, flags.is_ref_zero());
+ 
+    // Rundown bit should not be present.
+    assert_eq!(false, flags.is_rundown_in_progress());
+}
+
+//-------------------------------------------------------------------
+// Test: test_rundown_flags_set_in_progress
+//
+// Description:
+//  A test case to validate that the bit manipulations responsible
+//  for managing reference-count as well as the rundown-bit are
+//  correctly implemented and the masking works as required..
+//
+#[test]
+fn test_rundown_flags_set_in_progress() {
+    // Initialize an empty bit flags.
+    let mut flags = RundownFlags::empty();
+    assert_eq!(0, flags.get_ref());
+
+    // Turn on rundown in progress flags
+    flags = to_flags(flags.set_rundown_in_progress());
+
+    // Reference count should still be zero.
+    assert_eq!(0, flags.get_ref());
+    assert_eq!(true, flags.is_rundown_in_progress());
+
+    // Incrementing the reference count should work, and preserve flags.
+    flags = to_flags(flags.add_ref());
+    assert_eq!(1, flags.get_ref());
+    assert_eq!(true, flags.is_rundown_in_progress());
+}
+
 #[inline]
 fn to_flags(bits: u64) -> RundownFlags {
-    // We need to be able to preserve our refcount bits.
-    //
+    // To preserve the reference-count bits which are encoded with
+    // the flags we need to use the unchecked version. This requires
+    // the use of unsafe.
     unsafe { RundownFlags::from_bits_unchecked(bits) }
+}
+
+//-------------------------------------------------------------------
+// Test: test_to_flags
+//
+// Description:
+//  A test case to validate that to_flags correctly round-trips
+//  all of the bits, including both the flags and reference count.
+//
+#[test]
+fn test_to_flags() {
+    let flags = to_flags(0xF000000000000001);
+    assert_eq!(1, flags.get_ref());
+    assert_eq!(true, flags.is_rundown_in_progress());
 }
 
 pub struct RundownRef {
