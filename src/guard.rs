@@ -7,6 +7,9 @@ use crate::rundown_ref::RundownRef;
 ///
 /// This structure is created by the [`try_acquire'] method on ['RundownRef'].
 ///
+/// This type attempts to follow the RAII guidance here: 
+/// https://github.com/rust-unofficial/patterns/blob/master/patterns/RAII.md
+///
 pub struct RundownGuard<'a> {
     rundown_ref: &'a RundownRef,
 }
