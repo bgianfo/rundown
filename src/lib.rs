@@ -32,3 +32,4 @@ mod rundown_ref;
 //
 pub use guard::RundownGuard;
 pub use rundown_ref::RundownRef;
+pub use rundown_ref::RundownError;
