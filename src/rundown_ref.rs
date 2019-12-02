@@ -127,10 +127,17 @@ impl RundownRef {
         }
     }
 
-    /// Blocks thread execution until their are no outstanding reference
+    /// Blocks thread execution until there are no outstanding reference
     /// counts taken on the [`RundownRef`], and the internal representation
     /// has been marked with [`RundownFlags::RUNDOWN_IN_PROGRESS`] to signal
     /// that no other thread can safely acquire a reference count afterwards.
+    ///
+    /// # Important
+    ///
+    /// - This method is not thread safe, it must only be called by one thread.
+    ///
+    /// - This method is however idempotent, it can be called multiple times.
+    ///
     pub fn wait_for_rundown(&self) {
         let mut current = self.load_flags();
 
@@ -189,6 +196,9 @@ use std::thread;
 // Description:
 //  Test that wait_for_rundown correctly run-down protection fails
 //
+// Notes:
+//  This test needs access to the reference count directly to work.
+//
 #[test]
 #[allow(clippy::result_unwrap_used)]
 fn test_wait_when_protected() {
@@ -204,7 +214,7 @@ fn test_wait_when_protected() {
     });
 
     // Spin until the rundown bit is set, one set we know
-    // that the waiter wis going to wait and the signal that
+    // that the waiter is going to wait and the signal that
     // the drop below will send.
     while rundown.load_flags().is_pre_rundown() {
         thread::yield_now();
