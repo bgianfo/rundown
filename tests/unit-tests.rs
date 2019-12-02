@@ -6,6 +6,7 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
+#[cfg(test)]
 #[macro_use]
 extern crate assert_impl;
 
@@ -13,7 +14,7 @@ extern crate assert_impl;
 // Test: test_rundown_guard_implements_drop
 //
 // Description:
-//  Test that ['RundownGuard'] implements Drop.
+//  Test that RundownGuard implements Drop.
 //
 #[test]
 fn test_rundown_guard_implements_drop() {
@@ -38,14 +39,14 @@ fn test_acquisition_when_not_rundown() {
 }
 
 //-------------------------------------------------------------------
-// Test: test_acquisition_when_already_rundown
+// Test: test_acquisition_when_rundown
 //
 // Description:
 //  Test that acquisition of run-down protection fails
 //  when the RundownRef has successfully been run-down.
 //
 #[test]
-fn test_acquisition_when_already_rundown() {
+fn test_acquisition_when_rundown() {
     let rundown_ref = RundownRef::new();
 
     // Rundown the object.
@@ -53,6 +54,54 @@ fn test_acquisition_when_already_rundown() {
 
     let result = rundown_ref.try_acquire();
     assert_eq!(result.err(), Some(RundownError::RundownInProgress));
+}
+
+//-------------------------------------------------------------------
+// Test: test_re_init
+//
+// Description:
+//  Test that re_init works in the designed mode.
+//
+#[test]
+fn test_re_init() {
+    // Setup and completely run-down the object.
+    let rundown_ref = RundownRef::new();
+    rundown_ref.wait_for_rundown();
+
+    // Rundown on the object should succeed again.
+    rundown_ref.re_init();
+    rundown_ref.wait_for_rundown();
+}
+
+//-------------------------------------------------------------------
+// Test: test_re_init_panic_without_rundown
+//
+// Description:
+//  Test that re_init without running-down the object panics.
+//
+#[test]
+#[should_panic]
+fn test_re_init_panic_without_rundown() {
+    let rundown_ref = RundownRef::new();
+
+    // Re-init should panic as run-down has not occurred.
+    rundown_ref.re_init();
+}
+
+//-------------------------------------------------------------------
+// Test: test_re_init_panic_on_ref
+//
+// Description:
+//  Test that re_init with and outstanding protection panics.
+//
+#[test]
+#[should_panic]
+fn test_re_init_panic_on_ref() {
+    let rundown_ref = RundownRef::new();
+    let _guard = rundown_ref.try_acquire().unwrap();
+
+    // Re-init should panic as run-down has not occurred.
+    rundown_ref.re_init();
 }
 
 //-------------------------------------------------------------------
