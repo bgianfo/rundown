@@ -1,17 +1,23 @@
-# run-down [![Build Status][travis-ci-img]][travis-ci] [![GitHub license][license-img]][license] [![Dependabot Status][dependabot-img]][dependabot]
+run-down [![Build Status][travis-ci-img]][travis-ci] [![GitHub license][license-img]][license] [![Dependabot Status][dependabot-img]][dependabot]
+=====
 
-An implementation of run-down protection in rust.
+The `run-down` crate provides an implementation of run-down protection.
 
-Run-down protection is useful when to re-initialize or destroy a shared resource in a [SMP][smp-link] runtime environment.
+## Overview
+
+Run-down protection as a pattern is useful in situations where re-initialization
+or destruction of a shared resource is required in a [SMP][smp-link] environment.
 
 The pattern has two parts, a means to guarantee the resource is accessible and remains so for
 the during of it's usage. As well as way to make the resource inaccessible from a point going forward
 and the ability to wait for all outstanding usages to drain so you can safely perform the required operation. 
 
-This crate was inspired by the [run-down protection primitive available in the NT Kernel][nt-run-down-docs]. 
+This crate was inspired by the [run-down protection primitive in the NT kernel][nt-run-down-docs].
+Where it's used in situations such as driver unload, where futher access to the driver
+needs to be rejected and the unloading thread must wait for inflight acesss to stop before
+the driver can be completely unload.
 
-
-## Usage example
+## Example
 
 ```rust
 use run_down::{
@@ -34,7 +40,7 @@ for i in 1..25 {
         // thread could be running down the object as we execute.
         // 
         match rundown_clone.try_acquire() {
-            Ok(_) => {
+            Ok(run_down_guard) => {
                 println!("{}: Run-down protection acquired.", i);
 
                 // Stall the thread while holding rundown protection.
@@ -56,12 +62,9 @@ println!("0: Rundown complete");
 
  - Add a more interesting real-world example.
  
- - Expand the docs before publishing the crate.
-
  - Add some benchmarks to see if there is any opportunity to optimize the implementation.
 
 Note: This crate is not created by, affiliated with, or supported by Microsoft.
-
 
 <!-- Markdown References -->
 [travis-ci]: https://travis-ci.org/bgianfo/rust-run-down
