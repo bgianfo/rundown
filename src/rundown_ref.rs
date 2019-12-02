@@ -173,6 +173,46 @@ impl RundownRef {
         Self::default()
     }
 
+    /// Re-initialize this instance so it can be used again.
+    /// It is only valid to call re_init once the object is
+    /// completely run-down, via the wait_for_rundown method.
+    ///
+    /// # Important
+    ///
+    /// The moment this method returns, new rundown protection
+    /// requests can succeed. You must perform all re-initialization
+    /// of the shared object the run-down protection is guarding
+    /// before you call this method.
+    pub fn re_init(&self) {
+
+        let current = self.load_flags();
+
+        // Validate that the object in the correct state.
+        //
+        // TODO: Ideally we should have another bit to represent
+        // rundown being complete vs run-down in progress. It would
+        // give us a more clear state transition.
+        //
+        if !current.is_rundown_in_progress() ||
+           !current.is_ref_zero() {
+            panic!("Attempt to re-init before rundown is complete");
+        }
+
+        // Reset the event if it was previously lazily created so it
+        // can be used again in the future. If the event doesn't exist
+        // yet, then there is nothing to do.
+        if let Some(event) = self.event.get() {
+            event.reset();
+        }
+
+        // Zero the reference count to make the object ready for use.
+        //
+        // Note: Once this store completes then new instances of run-down
+        // protection will be able to be acquired immediately. All
+        // validation and re-initialization needs to occur before this point.
+        self.ref_count.store(0, ORDERING_VAL);
+    }
+
     /// Attempts to acquire rundown protection on this 'RundownRef',
     /// returns the ['RundownGuard'] which holds the reference count,
     /// or returns an error if the object is already being rundown.
