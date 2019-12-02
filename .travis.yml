@@ -1,4 +1,5 @@
 language: rust
+
 rust:
   - stable
   - nightly
@@ -6,3 +7,15 @@ rust:
 os:
   - windows
   - linux
+
+script:
+- cargo test
+
+matrix:
+  include:
+  - name: clippy
+    rust: stable
+    install:
+    - rustup component add clippy-preview
+    script:
+    - cargo clippy --lib --tests
