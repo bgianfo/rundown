@@ -65,14 +65,14 @@ Note: This crate is not created by, affiliated with, or supported by Microsoft.
 
 
 <!-- Markdown References -->
-[travis-ci]: https://travis-ci.org/bgianfo/rundown
-[travis-ci-img]: https://travis-ci.org/bgianfo/rundown.svg?branch=master
+[travis-ci]: https://travis-ci.org/bgianfo/rust-run-down
+[travis-ci-img]: https://travis-ci.org/bgianfo/rust-run-down.svg?branch=master
 
-[license]:https://github.com/bgianfo/rundown/blob/master/LICENSE
-[license-img]: https://img.shields.io/github/license/bgianfo/rundown.svg
+[license]:https://github.com/bgianfo/rust-run-down/blob/master/LICENSE
+[license-img]: https://img.shields.io/github/license/bgianfo/rust-run-down.svg
 
 [dependabot]: https://dependabot.com
-[dependabot-img]: https://api.dependabot.com/badges/status?host=github&repo=bgianfo/rundown
+[dependabot-img]: https://api.dependabot.com/badges/status?host=github&repo=bgianfo/rust-run-down
 
 [nt-run-down-docs]: https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/run-down-protection
 
