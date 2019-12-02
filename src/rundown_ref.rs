@@ -213,13 +213,23 @@ impl RundownRef {
         self.ref_count.store(0, ORDERING_VAL);
     }
 
-    /// Attempts to acquire rundown protection on this 'RundownRef',
-    /// returns the ['RundownGuard'] which holds the reference count,
+    /// Attempts to acquire rundown protection on this [`RundownRef`],
+    /// returns the [`RundownGuard`] which holds the reference count,
     /// or returns an error if the object is already being rundown.
     pub fn try_acquire(&self) -> Result<RundownGuard<'_>, RundownError> {
-        match self.try_acquire_internal() {
-            Ok(_) => Ok(RundownGuard::new(self)),
-            Err(er) => Err(er),
+        let mut current = self.load_flags();
+
+        loop {
+            if current.is_rundown_in_progress() {
+                return Err(RundownError::RundownInProgress);
+            }
+
+            let new_bits_with_ref = current.add_ref();
+
+            match self.compare_exchange(current.bits(), new_bits_with_ref) {
+                Ok(_) => return Ok(RundownGuard::new(self)),
+                Err(new_current) => current = to_flags(new_current),
+            }
         }
     }
 
@@ -246,8 +256,8 @@ impl RundownRef {
     }
 
     /// Blocks thread execution until their are no outstanding reference
-    /// counts taken on the ['RundownRef'], and the internal representation
-    /// has been marked with ['RundownFlags::RUNDOWN_IN_PROGRESS'] to signal
+    /// counts taken on the [`RundownRef`], and the internal representation
+    /// has been marked with [`RundownFlags::RUNDOWN_IN_PROGRESS`] to signal
     /// that no other thread can safely acquire a reference count afterwards.
     pub fn wait_for_rundown(&self) {
         let mut current = self.load_flags();
@@ -279,24 +289,6 @@ impl RundownRef {
         if !current.is_ref_zero() {
             let event = self.event.get().expect("Must have been set");
             event.wait();
-        }
-    }
-
-    /// Utility function to attempt to try to acquire run-down protection.
-    fn try_acquire_internal(&self) -> Result<(), RundownError> {
-        let mut current = self.load_flags();
-
-        loop {
-            if current.is_rundown_in_progress() {
-                return Err(RundownError::RundownInProgress);
-            }
-
-            let new_bits_with_ref = current.add_ref();
-
-            match self.compare_exchange(current.bits(), new_bits_with_ref) {
-                Ok(_) => return Ok(()),
-                Err(new_current) => current = to_flags(new_current),
-            }
         }
     }
 
