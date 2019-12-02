@@ -13,6 +13,7 @@ use std::time::Duration;
 //  Test that RundownGuard implements Drop.
 //
 #[test]
+#[allow(clippy::drop_bounds)]
 fn test_rundown_guard_implements_drop() {
 
     // Test via compilation.
@@ -125,11 +126,10 @@ fn test_usage_with_concurrency() {
     for _ in 0..20 {
         let rundown_clone = Arc::clone(&rundown);
 
-        thread::spawn(move || match rundown_clone.try_acquire() {
-            Ok(_) => {
+        thread::spawn(move || {
+            if let Ok(_guard) = rundown_clone.try_acquire() {
                 thread::sleep(Duration::from_millis(10));
             }
-            Err(_) => return,
         });
     }
 

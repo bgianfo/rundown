@@ -165,7 +165,7 @@ const fn to_flags(bits: u64) -> RundownFlags {
 //
 #[test]
 fn test_to_flags() {
-    let flags = to_flags(0xF000000000000001);
+    let flags = to_flags(0xF000_0000_0000_0001);
     assert_eq!(1, flags.get_ref());
     assert_eq!(true, flags.is_rundown_in_progress());
 }

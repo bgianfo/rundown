@@ -63,7 +63,6 @@
     clippy::nursery,
     clippy::cargo
 )]
-
 // Disable warnings for things we don't care about.
 #![allow(unknown_lints)]
 #![allow(clippy::implicit_return)]
