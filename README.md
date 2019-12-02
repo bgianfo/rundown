@@ -1,4 +1,4 @@
-run-down [![Build Status][travis-ci-img]][travis-ci] [![][crate-img]][crate] [![GitHub license][license-img]][license] [![Dependabot Status][dependabot-img]][dependabot]
+run-down [![Build Status][travis-ci-img]][travis-ci] [![][crate-img]][crate] [![codecov][codecov-img]][codecov] [![GitHub license][license-img]][license] [![Dependabot Status][dependabot-img]][dependabot]
 =====
 
 The `run-down` crate provides an implementation of run-down protection.
@@ -79,8 +79,12 @@ Note: This crate is not created by, affiliated with, or supported by Microsoft.
 
 [dependabot]: https://dependabot.com
 [dependabot-img]: https://api.dependabot.com/badges/status?host=github&repo=bgianfo/rust-run-down
+
 [crate]: https://crates.io/crates/run-down
 [crate-img]:http://meritbadge.herokuapp.com/run-down
+
+[codecov]: https://codecov.io/gh/bgianfo/rust-run-down
+[codecov-img]:https://codecov.io/gh/bgianfo/rust-run-down/branch/master/graph/badge.svg
 
 [nt-run-down-docs]: https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/run-down-protection
 
