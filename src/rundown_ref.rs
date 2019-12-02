@@ -45,6 +45,12 @@ impl RundownFlags {
         self.get_ref() == 0
     }
 
+    /// Returns true if the reference-count is non zero.
+    #[inline]
+    pub const fn is_ref_active(self) -> bool {
+        self.get_ref() > 0
+    }
+
     /// Returns a new reference-count with a incremented reference count.
     #[inline]
     pub fn add_ref(self) -> u64 {
@@ -79,16 +85,19 @@ fn test_rundown_flags_refcount() {
     let mut flags = RundownFlags::empty();
     assert_eq!(0, flags.get_ref());
     assert_eq!(true, flags.is_ref_zero());
+    assert_eq!(false, flags.is_ref_active());
 
     // Validate that add ref works.
     flags = to_flags(flags.add_ref());
     assert_eq!(1, flags.get_ref());
     assert_eq!(false, flags.is_ref_zero());
+    assert_eq!(true, flags.is_ref_active());
 
     // Validate that dec ref works.
     flags = to_flags(flags.dec_ref());
     assert_eq!(0, flags.get_ref());
     assert_eq!(true, flags.is_ref_zero());
+    assert_eq!(false, flags.is_ref_active());
 
     // Rundown bit should not be present.
     assert_eq!(false, flags.is_rundown_in_progress());
@@ -224,7 +233,7 @@ impl RundownRef {
         // rundown being complete vs run-down in progress. It would
         // give us a more clear state transition.
         //
-        if !current.is_rundown_in_progress() || !current.is_ref_zero() {
+        if !current.is_rundown_in_progress() || current.is_ref_active() {
             panic!("Attempt to re-init before rundown is complete");
         }
 
@@ -293,18 +302,17 @@ impl RundownRef {
         let mut current = self.load_flags();
 
         loop {
-            // Create the event as it appears other thread
-            // are going to need to release their refs for
+            // If there are outstanding protection reference-counts
+            // then create the event. At this point it appears that
+            // other threads need to release their protection for
             // this thread to complete the rundown.
-            //
-            if !current.is_ref_zero() {
+            if current.is_ref_active() {
                 self.event
                     .get_or_create(|| ManualResetEvent::new(State::Unset));
             }
 
             // Turn on the rundown bit to inform all other threads
             // that rundown is in progress.
-            //
             let bits_with_rundown = current.set_rundown_in_progress();
 
             match self.compare_exchange(current.bits(), bits_with_rundown) {
@@ -316,7 +324,7 @@ impl RundownRef {
             }
         }
 
-        if !current.is_ref_zero() {
+        if current.is_ref_active() {
             let event = self.event.get().expect("Must have been set");
             event.wait();
         }
