@@ -1,5 +1,4 @@
 run-down [![Build Status][travis-ci-img]][travis-ci] [![][crate-img]][crate] [![GitHub license][license-img]][license] [![Dependabot Status][dependabot-img]][dependabot]
-
 =====
 
 The `run-down` crate provides an implementation of run-down protection.
