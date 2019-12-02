@@ -8,13 +8,27 @@ os:
   - windows
   - linux
 
+before_cache: |
+  if [[ "$TRAVIS_RUST_VERSION" == stable && "$TRAVIS_OS_NAME" == "linux" ]]; then
+    cargo install cargo-tarpaulin -f
+  fi
+
+after_success: |
+  if [[ "$TRAVIS_RUST_VERSION" == stable && "$TRAVIS_OS_NAME" == "linux" ]]; then
+    cargo tarpaulin --out Xml
+    bash <(curl -s https://codecov.io/bash)
+  fi
+
 script:
+- cargo clean
+- cargo build
 - cargo test
 
 matrix:
   include:
   - name: clippy
     rust: stable
+    os: linux
     install:
     - rustup component add clippy-preview
     script:
