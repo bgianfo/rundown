@@ -26,6 +26,12 @@ impl RundownFlags {
         self.contains(Self::RUNDOWN_IN_PROGRESS)
     }
 
+    /// Returns true if the run-down in progress flag is not set.
+    #[inline]
+    pub const fn is_pre_rundown(self) -> bool {
+        !self.contains(Self::RUNDOWN_IN_PROGRESS)
+    }
+
     /// Returns a new reference-count with the run-down
     /// in progress flag set in the upper bits.
     #[inline]
@@ -101,6 +107,7 @@ fn test_rundown_flags_refcount() {
 
     // Rundown bit should not be present.
     assert_eq!(false, flags.is_rundown_in_progress());
+    assert_eq!(true, flags.is_pre_rundown());
 }
 
 //-------------------------------------------------------------------
@@ -123,11 +130,13 @@ fn test_rundown_flags_set_in_progress() {
     // Reference count should still be zero.
     assert_eq!(0, flags.get_ref());
     assert_eq!(true, flags.is_rundown_in_progress());
+    assert_eq!(false, flags.is_pre_rundown());
 
     // Incrementing the reference count should work, and preserve flags.
     flags = to_flags(flags.add_ref());
     assert_eq!(1, flags.get_ref());
     assert_eq!(true, flags.is_rundown_in_progress());
+    assert_eq!(false, flags.is_pre_rundown());
 }
 
 //-------------------------------------------------------------------
@@ -233,7 +242,7 @@ impl RundownRef {
         // rundown being complete vs run-down in progress. It would
         // give us a more clear state transition.
         //
-        if !current.is_rundown_in_progress() || current.is_ref_active() {
+        if current.is_pre_rundown() || current.is_ref_active() {
             panic!("Attempt to re-init before rundown is complete");
         }
 
@@ -370,8 +379,10 @@ fn test_wait_when_protected() {
         rundown_clone.wait_for_rundown();
     });
 
-    // Spin until set it's bit, and is going to consume the signal.
-    while !rundown.load_flags().is_rundown_in_progress() {
+    // Spin until the rundown bit is set, one set we know
+    // that the waiter wis going to wait and the signal that
+    // the drop below will send.
+    while rundown.load_flags().is_pre_rundown() {
         thread::yield_now();
     }
 
