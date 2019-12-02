@@ -6,10 +6,6 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
-#[cfg(test)]
-#[macro_use]
-extern crate assert_impl;
-
 //-------------------------------------------------------------------
 // Test: test_rundown_guard_implements_drop
 //
@@ -18,7 +14,13 @@ extern crate assert_impl;
 //
 #[test]
 fn test_rundown_guard_implements_drop() {
-    assert_impl!(Drop: RundownGuard);
+
+    // Test via compilation.
+    fn is_droppable<T: Drop>() {}
+    is_droppable::<RundownGuard>();
+
+    // Verify with needs_drop as well.
+    assert!(std::mem::needs_drop::<RundownGuard>());
 }
 
 //-------------------------------------------------------------------
