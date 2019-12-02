@@ -5,9 +5,10 @@ use std::result::Result;
 use std::sync::atomic::AtomicU64;
 use std::sync::atomic::Ordering;
 
+/// The set of errors returned by methods in the run-down crate.
 #[derive(Debug, PartialEq)]
 pub enum RundownError {
-    /// The rundown reference is already in the middle of being rundown.
+    /// Rundown is already in progress on this shared object.
     RundownInProgress,
 }
 
@@ -18,31 +19,39 @@ bitflags! {
 }
 
 impl RundownFlags {
+
+    /// Returns true if the run-down in progress flag is set.
     #[inline]
     pub const fn is_rundown_in_progress(self) -> bool {
         self.contains(Self::RUNDOWN_IN_PROGRESS)
     }
 
+    /// Returns a new reference-count with the run-down
+    /// in progress flag set in the upper bits.
     #[inline]
     pub const fn set_rundown_in_progress(self) -> u64 {
         self.bits | Self::RUNDOWN_IN_PROGRESS.bits
     }
 
+    /// Returns just the reference-count encoded in the flags.
     #[inline]
     pub const fn get_ref(self) -> u64 {
         self.bits & (!Self::RUNDOWN_IN_PROGRESS.bits)
     }
 
+    /// Returns true if the reference-count is zero.
     #[inline]
     pub const fn is_ref_zero(self) -> bool {
         self.get_ref() == 0
     }
 
+    /// Returns a new reference-count with incremented reference.
     #[inline]
     pub const fn add_ref(self) -> u64 {
         self.bits + 1
     }
 
+    /// Returns a new reference-count with one decremented reference.
     #[inline]
     pub const fn dec_ref(self) -> u64 {
         self.bits - 1
@@ -104,6 +113,7 @@ fn test_rundown_flags_set_in_progress() {
     assert_eq!(true, flags.is_rundown_in_progress());
 }
 
+/// Utility function for converting raw bits to `RundownFlags`.
 #[inline]
 const fn to_flags(bits: u64) -> RundownFlags {
     // To preserve the reference-count bits which are encoded with
@@ -214,6 +224,7 @@ impl RundownRef {
         }
     }
 
+    /// Utility function to attempt to try to acquire run-down protection.
     fn try_acquire_internal(&self) -> Result<(), RundownError> {
         let mut current = self.load_flags();
 
@@ -231,12 +242,14 @@ impl RundownRef {
         }
     }
 
+    /// Utility function to load the current flags atomically so that
+    /// we can start our Atomic Compare and Swap loops.
     #[inline]
     fn load_flags(&self) -> RundownFlags {
         to_flags(self.ref_count.load(ORDERING_VAL))
     }
 
-    /// Internal helper method to make all of the compare exchange loops a bit
+    /// Utility method to make all of the compare exchange loops a bit
     /// more readable by omitting constant parameters.
     #[inline]
     fn compare_exchange(&self, current: u64, new: u64) -> Result<u64, u64> {
