@@ -1,8 +1,8 @@
-use run_down::{RundownGuard, RundownRef, RundownError};
+use pretty_assertions::assert_eq;
+use run_down::{RundownError, RundownGuard, RundownRef};
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use pretty_assertions::{assert_eq};
 
 #[macro_use]
 extern crate assert_impl;
@@ -72,11 +72,11 @@ fn test_usage_with_concurrency() {
     for _ in 0..20 {
         let rundown_clone = Arc::clone(&rundown);
 
-        thread::spawn(move || {
-            match rundown_clone.try_acquire() {
-                Ok(_) => { thread::sleep(Duration::from_millis(10)); }
-                Err(_) => return,
+        thread::spawn(move || match rundown_clone.try_acquire() {
+            Ok(_) => {
+                thread::sleep(Duration::from_millis(10));
             }
+            Err(_) => return,
         });
     }
 

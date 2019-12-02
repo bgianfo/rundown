@@ -19,7 +19,6 @@ bitflags! {
 }
 
 impl RundownFlags {
-
     /// Returns true if the run-down in progress flag is set.
     #[inline]
     pub const fn is_rundown_in_progress(self) -> bool {
@@ -81,7 +80,7 @@ fn test_rundown_flags_refcount() {
     flags = to_flags(flags.dec_ref());
     assert_eq!(0, flags.get_ref());
     assert_eq!(true, flags.is_ref_zero());
- 
+
     // Rundown bit should not be present.
     assert_eq!(false, flags.is_rundown_in_progress());
 }
@@ -140,7 +139,6 @@ fn test_to_flags() {
 /// The type would be embedded in the object needing run-down protection.
 #[derive(Default)]
 pub struct RundownRef {
-
     /// The reference count used to track the threads that currently have
     /// outstanding run-down protection request being tracked by this object.
     ///
@@ -155,7 +153,7 @@ pub struct RundownRef {
     ref_count: AtomicU64,
 
     /// The event used to signal the thread waiting for rundown that
-    /// rundown is now complete. 
+    /// rundown is now complete.
     ///
     /// The event is lazy initialized to avoid allocating the event
     /// unless there is an active reference count when rundown started.
@@ -166,7 +164,6 @@ pub struct RundownRef {
 const ORDERING_VAL: Ordering = Ordering::SeqCst;
 
 impl RundownRef {
-
     /// Initializes a new [`RundownRef`].
     #[inline]
     pub fn new() -> Self {
@@ -184,7 +181,6 @@ impl RundownRef {
     /// of the shared object the run-down protection is guarding
     /// before you call this method.
     pub fn re_init(&self) {
-
         let current = self.load_flags();
 
         // Validate that the object in the correct state.
@@ -193,8 +189,7 @@ impl RundownRef {
         // rundown being complete vs run-down in progress. It would
         // give us a more clear state transition.
         //
-        if !current.is_rundown_in_progress() ||
-           !current.is_ref_zero() {
+        if !current.is_rundown_in_progress() || !current.is_ref_zero() {
             panic!("Attempt to re-init before rundown is complete");
         }
 

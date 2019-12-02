@@ -7,16 +7,14 @@ use crate::rundown_ref::RundownRef;
 ///
 /// This structure is created by the `try_acquire` method on `RundownRef`.
 ///
-/// This type attempts to follow the RAII guidance here: 
+/// This type attempts to follow the RAII guidance here:
 /// <https://github.com/rust-unofficial/patterns/blob/master/patterns/RAII.md>
 pub struct RundownGuard<'r> {
-
     /// The run-dwon reference that this guard objec points too.
     owned_run_down_ref: &'r RundownRef,
 }
 
 impl<'r> RundownGuard<'r> {
-
     /// Creates a new [`RundownGuard`] which owns an instance of run-down
     /// protection on the [`RundownRef`] provided.
     ///
