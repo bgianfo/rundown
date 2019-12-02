@@ -45,16 +45,24 @@ impl RundownFlags {
         self.get_ref() == 0
     }
 
-    /// Returns a new reference-count with incremented reference.
+    /// Returns a new reference-count with a incremented reference count.
     #[inline]
-    pub const fn add_ref(self) -> u64 {
-        self.bits + 1
+    pub fn add_ref(self) -> u64 {
+        if let Some(new_value) = self.bits.checked_add(1) {
+            new_value
+        } else {
+            panic!("Incrementing the reference-count would have over-flowed!");
+        }
     }
 
-    /// Returns a new reference-count with one decremented reference.
+    /// Returns a new reference-count with a decremented reference count.
     #[inline]
-    pub const fn dec_ref(self) -> u64 {
-        self.bits - 1
+    pub fn dec_ref(self) -> u64 {
+        if let Some(new_value) = self.bits.checked_sub(1) {
+            new_value
+        } else {
+            panic!("Decrementing the reference-count would have under-flowed!");
+        }
     }
 }
 
@@ -111,6 +119,32 @@ fn test_rundown_flags_set_in_progress() {
     flags = to_flags(flags.add_ref());
     assert_eq!(1, flags.get_ref());
     assert_eq!(true, flags.is_rundown_in_progress());
+}
+
+//-------------------------------------------------------------------
+// Test: test_rundown_flags_overflow_panic
+//
+// Description:
+//  A test case to validate that reference-count panics on overflow.
+//
+#[test]
+#[should_panic]
+fn test_rundown_flags_overflow_panic() {
+    let flags = to_flags(0xFFFF_FFFF_FFFF_FFFF);
+    flags.add_ref();
+}
+
+//-------------------------------------------------------------------
+// Test: test_rundown_flags_underflow_panic
+//
+// Description:
+//  A test case to validate that reference-count panics on underflow.
+//
+#[test]
+#[should_panic]
+fn test_rundown_flags_underflow_panic() {
+    let flags = RundownFlags::empty();
+    flags.dec_ref();
 }
 
 /// Utility function for converting raw bits to `RundownFlags`.

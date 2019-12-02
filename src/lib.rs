@@ -8,6 +8,7 @@
     clippy::nursery,
     clippy::cargo
 )]
+
 // Disable warnings for things we don't care about.
 #![allow(unknown_lints)]
 #![allow(clippy::implicit_return)]
@@ -15,8 +16,7 @@
 #![allow(clippy::multiple_inherent_impl)]
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::module_name_repetitions)]
-// TODO: We should really fix these issues.
-#![allow(clippy::integer_arithmetic)]
+#![allow(clippy::missing_docs_in_private_items)]
 
 // Import the crates we need to use
 #[macro_use]
