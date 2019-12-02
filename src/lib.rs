@@ -41,3 +41,8 @@ mod rundown_ref;
 pub use guard::RundownGuard;
 pub use rundown_ref::RundownError;
 pub use rundown_ref::RundownRef;
+
+extern crate doc_comment;
+
+// Test examples in the README file.
+doc_comment::doctest!("../README.md", readme_examples);
