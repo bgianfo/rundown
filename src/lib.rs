@@ -78,6 +78,7 @@ extern crate bitflags;
 extern crate lazy_init;
 extern crate rsevents;
 
+mod flags;
 mod guard;
 mod rundown_ref;
 pub use guard::RundownGuard;
