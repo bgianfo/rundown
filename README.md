@@ -1,4 +1,5 @@
-run-down [![Build Status][travis-ci-img]][travis-ci] [![GitHub license][license-img]][license] [![Dependabot Status][dependabot-img]][dependabot]
+run-down [![Build Status][travis-ci-img]][travis-ci] [![][crate-img]][crate] [![GitHub license][license-img]][license] [![Dependabot Status][dependabot-img]][dependabot]
+
 =====
 
 The `run-down` crate provides an implementation of run-down protection.
@@ -16,6 +17,10 @@ This crate was inspired by the [run-down protection primitive in the NT kernel][
 Where it's used in situations such as driver unload, where futher access to the driver
 needs to be rejected and the unloading thread must wait for inflight acesss to stop before
 the driver can be completely unload.
+
+## Documentation
+
+[https://docs.rs/run-down](https://docs.rs/run-down)
 
 ## Example
 
@@ -75,7 +80,10 @@ Note: This crate is not created by, affiliated with, or supported by Microsoft.
 
 [dependabot]: https://dependabot.com
 [dependabot-img]: https://api.dependabot.com/badges/status?host=github&repo=bgianfo/rust-run-down
+[crate]: https://crates.io/crates/run-down
+[crate-img]:http://meritbadge.herokuapp.com/run-down
 
 [nt-run-down-docs]: https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/run-down-protection
 
 [smp-link]: https://en.wikipedia.org/wiki/Symmetric_multiprocessing
+
