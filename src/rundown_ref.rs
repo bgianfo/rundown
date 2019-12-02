@@ -214,4 +214,8 @@ fn test_wait_when_protected() {
     std::mem::drop(guard);
 
     waiter.join().unwrap();
+
+    // Verify re-init works after the event is used.
+    // TODO: Split out into an independent test.
+    rundown.re_init();
 }

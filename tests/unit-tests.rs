@@ -58,6 +58,21 @@ fn test_acquisition_when_rundown() {
     assert_eq!(result.err(), Some(RundownError::RundownInProgress));
 }
 
+// Test: test_multiple_successive_waits
+//
+// Description:
+//  Test that sucessive wait_for_rundown work.
+//
+#[test]
+fn test_multiple_successive_waits() {
+    // Setup and completely run-down the object.
+    let rundown_ref = RundownRef::new();
+
+    for _ in 0..10 {
+        rundown_ref.wait_for_rundown();
+    }
+}
+
 //-------------------------------------------------------------------
 // Test: test_re_init
 //
