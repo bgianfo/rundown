@@ -292,15 +292,14 @@ impl RundownRef {
         }
     }
 
-    /// Utility function to load the current flags atomically so that
-    /// we can start our Atomic Compare and Swap loops.
+    /// Load the current flags atomically, for use in the start of all
+    /// atomic compare and exchange loops in this implementation..
     #[inline]
     fn load_flags(&self) -> RundownFlags {
         to_flags(self.ref_count.load(ORDERING_VAL))
     }
 
-    /// Utility method to make all of the compare exchange loops a bit
-    /// more readable by omitting constant parameters.
+    /// Readability wrapper around atomic compare exchange.
     #[inline]
     fn compare_exchange(&self, current: u64, new: u64) -> Result<u64, u64> {
         self.ref_count
