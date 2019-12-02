@@ -2,8 +2,7 @@ use crate::guard::RundownGuard;
 use lazy_init::Lazy;
 use rsevents::{Awaitable, ManualResetEvent, State};
 use std::result::Result;
-use std::sync::atomic::AtomicU64;
-use std::sync::atomic::Ordering;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 /// The set of errors returned by methods in the run-down crate.
 #[derive(Debug, PartialEq)]
@@ -156,7 +155,7 @@ pub struct RundownRef {
     /// rundown is now complete.
     ///
     /// The event is lazy initialized to avoid allocating the event
-    /// unless there is an active reference count when rundown started.
+    /// unless there is an active reference count when rundown starts.
     event: Lazy<ManualResetEvent>,
 }
 
