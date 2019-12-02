@@ -1,3 +1,5 @@
+// Copyright 2019 Brian Gianforcaro
+
 use pretty_assertions::assert_eq;
 use run_down::{RundownError, RundownGuard, RundownRef};
 use std::sync::Arc;

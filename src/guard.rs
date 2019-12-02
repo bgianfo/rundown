@@ -1,3 +1,5 @@
+// Copyright 2019 Brian Gianforcaro
+
 use crate::rundown_ref::RundownRef;
 
 /// An RAII implementation of a "scoped lock" pattern, but specialized

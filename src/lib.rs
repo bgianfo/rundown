@@ -1,3 +1,5 @@
+// Copyright 2019 Brian Gianforcaro
+
 // Subscribe to most of the clippy lints.
 #![warn(
     clippy::all,

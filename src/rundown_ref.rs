@@ -1,3 +1,5 @@
+// Copyright 2019 Brian Gianforcaro
+
 use crate::guard::RundownGuard;
 use lazy_init::Lazy;
 use rsevents::{Awaitable, ManualResetEvent, State};
