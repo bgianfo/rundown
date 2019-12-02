@@ -344,3 +344,39 @@ impl RundownRef {
             .compare_exchange(current, new, ORDERING_VAL, ORDERING_VAL)
     }
 }
+
+#[cfg(test)]
+use std::sync::Arc;
+#[cfg(test)]
+use std::thread;
+
+//-------------------------------------------------------------------
+// Test: test_wait_when_protected
+//
+// Description:
+//  Test that wait_for_rundown correctly run-down protection fails
+//
+#[test]
+#[allow(clippy::result_unwrap_used)]
+fn test_wait_when_protected() {
+    let rundown = Arc::new(RundownRef::new());
+
+    // Acquire protection.
+    let guard = rundown.try_acquire().unwrap();
+
+    // Launch a thread to wait for rundown.
+    let rundown_clone = Arc::clone(&rundown);
+    let waiter = thread::spawn(move || {
+        rundown_clone.wait_for_rundown();
+    });
+
+    // Spin until set it's bit, and is going to consume the signal.
+    while !rundown.load_flags().is_rundown_in_progress() {
+        thread::yield_now();
+    }
+
+    // Release protection, the waiter should be signaled.
+    std::mem::drop(guard);
+
+    waiter.join().unwrap();
+}

@@ -15,7 +15,6 @@ use std::time::Duration;
 #[test]
 #[allow(clippy::drop_bounds)]
 fn test_rundown_guard_implements_drop() {
-
     // Test via compilation.
     fn is_droppable<T: Drop>() {}
     is_droppable::<RundownGuard>();
@@ -121,17 +120,22 @@ fn test_re_init_panic_on_ref() {
 //
 #[test]
 fn test_usage_with_concurrency() {
+    let mut children = vec![];
     let rundown = Arc::new(RundownRef::new());
 
     for _ in 0..20 {
         let rundown_clone = Arc::clone(&rundown);
 
-        thread::spawn(move || {
+        children.push(thread::spawn(move || {
             if let Ok(_guard) = rundown_clone.try_acquire() {
                 thread::sleep(Duration::from_millis(10));
             }
-        });
+        }));
     }
 
     rundown.wait_for_rundown();
+
+    for child in children {
+        let _ = child.join();
+    }
 }
