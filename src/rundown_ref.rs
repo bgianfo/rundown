@@ -136,28 +136,46 @@ fn test_to_flags() {
     assert_eq!(true, flags.is_rundown_in_progress());
 }
 
+/// Tracks the status of run-down protection for an object.
+/// The type would be embedded in the object needing run-down protection.
 #[derive(Default)]
 pub struct RundownRef {
+
+    /// The reference count used to track the threads that currently have
+    /// outstanding run-down protection request being tracked by this object.
+    ///
+    /// The reference count holds two parts, the actual count in the lower bits
+    /// and the flags bit in the most significant bit of the u64. The flags and
+    /// reference count interpretation logic is encapsulated in the RundownFlags
+    /// type. It has the logic to correctly mask and fetch the required bits.
+    ///
+    /// We need to bit-pack the flags with the reference count, as we need a single
+    /// atomic type that we can use to implement the interlocked operations which
+    /// provide the thread safety guaranteed by this type.
     ref_count: AtomicU64,
 
-    // Avoid allocating the event unless necessary
-    // during the wait operation.
-    //
+    /// The event used to signal the thread waiting for rundown that
+    /// rundown is now complete. 
+    ///
+    /// The event is lazy initialized to avoid allocating the event
+    /// unless there is an active reference count when rundown started.
     event: Lazy<ManualResetEvent>,
 }
 
+/// Common atomic ordering option for all of our compare exchange, loads and stores.
 const ORDERING_VAL: Ordering = Ordering::SeqCst;
 
 impl RundownRef {
-    /// Initializes a new ['RundownRef'].
+
+    /// Initializes a new [`RundownRef`].
     #[inline]
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Attempts to acquire rundown protection on this 'RundownRef',
-    /// returns the ['RundownGuard'] which holds the refcount, or
-    /// returns an error if the object is already being rundown.
+    /// returns the ['RundownGuard'] which holds the reference count,
+    /// or returns an error if the object is already being rundown.
     pub fn try_acquire(&self) -> Result<RundownGuard<'_>, RundownError> {
         match self.try_acquire_internal() {
             Ok(_) => Ok(RundownGuard::new(self)),
