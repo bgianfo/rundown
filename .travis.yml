@@ -21,7 +21,6 @@ after_success: |
   fi
 
 script:
-- cargo clean
 - cargo build
 - cargo test
 
