@@ -166,7 +166,7 @@ fn test_usage_with_concurrency() {
 #[test]
 fn test_mini_stress() {
     let mut children = vec![];
-    let stop_flag  = Arc::new(AtomicBool::new(true));
+    let stop_flag  = Arc::new(AtomicBool::new(false));
     let rundown = Arc::new(RundownRef::new());
 
     for _ in 0..5 {
