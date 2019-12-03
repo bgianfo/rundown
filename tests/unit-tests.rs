@@ -5,6 +5,7 @@ use run_down::{RundownError, RundownGuard, RundownRef};
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
+use std::{sync::atomic::AtomicBool, sync::atomic::Ordering};
 
 //-------------------------------------------------------------------
 // Test: test_rundown_guard_implements_drop
@@ -149,6 +150,66 @@ fn test_usage_with_concurrency() {
     }
 
     rundown.wait_for_rundown();
+
+    for child in children {
+        let _ = child.join();
+    }
+}
+
+//-------------------------------------------------------------------
+// Test: test_mini_stress
+//
+// Description:
+//  A simple mini stress test to validate the usage of RundownRef
+//  and RundownGuard in a situation with contention.
+//
+#[test]
+fn test_mini_stress() {
+    let mut children = vec![];
+    let stop_flag  = Arc::new(AtomicBool::new(true));
+    let rundown = Arc::new(RundownRef::new());
+
+    for _ in 0..5 {
+        let rundown_clone = Arc::clone(&rundown);
+        let stop_flag_clone = Arc::clone(&stop_flag);
+        children.push(thread::spawn(move || {
+            loop {
+                if stop_flag_clone.load(Ordering::SeqCst) {
+                    break;
+                }
+
+                if let Ok(_guard) = rundown_clone.try_acquire() {
+                    thread::yield_now();
+                }
+            }
+        }));
+    }
+
+    // Launch a thread that repeadedly runs-down the object
+    // and then re-initializes it.
+    //
+    let rundown_clone_2 = Arc::clone(&rundown);
+    let stop_flag_clone_2 = Arc::clone(&stop_flag);
+    children.push(thread::spawn(move || {
+        loop
+        {
+            if stop_flag_clone_2.load(Ordering::SeqCst) {
+                break;
+            }
+
+            rundown_clone_2.wait_for_rundown();
+
+            thread::yield_now();
+
+            rundown_clone_2.re_init();
+        }
+    }));
+
+    rundown.wait_for_rundown();
+
+    thread::sleep(Duration::from_secs(5));
+
+    stop_flag.store(true, Ordering::SeqCst);
 
     for child in children {
         let _ = child.join();
