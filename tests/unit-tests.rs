@@ -169,7 +169,7 @@ fn test_mini_stress() {
     let stop_flag  = Arc::new(AtomicBool::new(false));
     let rundown = Arc::new(RundownRef::new());
 
-    for _ in 0..5 {
+    for _ in 0..25 {
         let rundown_clone = Arc::clone(&rundown);
         let stop_flag_clone = Arc::clone(&stop_flag);
         children.push(thread::spawn(move || {
@@ -198,16 +198,11 @@ fn test_mini_stress() {
             }
 
             rundown_clone_2.wait_for_rundown();
-
-            thread::yield_now();
-
             rundown_clone_2.re_init();
         }
     }));
 
-    rundown.wait_for_rundown();
-
-    thread::sleep(Duration::from_secs(5));
+    thread::sleep(Duration::from_secs(10));
 
     stop_flag.store(true, Ordering::SeqCst);
 
