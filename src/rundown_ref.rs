@@ -37,9 +37,6 @@ pub struct RundownRef {
     event: Lazy<ManualResetEvent>,
 }
 
-/// Common atomic ordering option for all of our compare exchange, loads and stores.
-const ORDERING_VAL: Ordering = Ordering::SeqCst;
-
 impl RundownRef {
     /// Initializes a new [`RundownRef`].
     #[inline]
@@ -82,7 +79,7 @@ impl RundownRef {
         // Note: Once this store completes then new instances of run-down
         // protection will be able to be acquired immediately. All
         // validation and re-initialization needs to occur before this point.
-        self.ref_count.store(0, ORDERING_VAL);
+        self.ref_count.store(0, Ordering::Release);
     }
 
     /// Attempts to acquire rundown protection on this [`RundownRef`],
@@ -152,7 +149,7 @@ impl RundownRef {
             }
 
             // Turn on the rundown bit to inform all other threads
-            // that rundown is in progress.
+            // that rundown is currently in progress.
             let bits_with_rundown = current.set_rundown_in_progress();
 
             match self.compare_exchange(current.bits(), bits_with_rundown) {
@@ -174,14 +171,17 @@ impl RundownRef {
     /// atomic compare and exchange loops in this implementation..
     #[inline]
     fn load_flags(&self) -> RundownFlags {
-        to_flags(self.ref_count.load(ORDERING_VAL))
+        // We use Relaxed ordering, as the value is always
+        // going to be checked by the compare_exchange later
+        // in the loop.
+        to_flags(self.ref_count.load(Ordering::Relaxed))
     }
 
     /// Readability wrapper around atomic compare exchange.
     #[inline]
     fn compare_exchange(&self, current: u64, new: u64) -> Result<u64, u64> {
         self.ref_count
-            .compare_exchange(current, new, ORDERING_VAL, ORDERING_VAL)
+            .compare_exchange(current, new, Ordering::Acquire, Ordering::Relaxed)
     }
 }
 
