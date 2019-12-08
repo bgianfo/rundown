@@ -166,21 +166,19 @@ fn test_usage_with_concurrency() {
 #[test]
 fn test_mini_stress() {
     let mut children = vec![];
-    let stop_flag  = Arc::new(AtomicBool::new(false));
+    let stop_flag = Arc::new(AtomicBool::new(false));
     let rundown = Arc::new(RundownRef::new());
 
     for _ in 0..25 {
         let rundown_clone = Arc::clone(&rundown);
         let stop_flag_clone = Arc::clone(&stop_flag);
-        children.push(thread::spawn(move || {
-            loop {
-                if stop_flag_clone.load(Ordering::SeqCst) {
-                    break;
-                }
+        children.push(thread::spawn(move || loop {
+            if stop_flag_clone.load(Ordering::SeqCst) {
+                break;
+            }
 
-                if let Ok(_guard) = rundown_clone.try_acquire() {
-                    thread::yield_now();
-                }
+            if let Ok(_guard) = rundown_clone.try_acquire() {
+                thread::yield_now();
             }
         }));
     }
@@ -190,16 +188,13 @@ fn test_mini_stress() {
     //
     let rundown_clone_2 = Arc::clone(&rundown);
     let stop_flag_clone_2 = Arc::clone(&stop_flag);
-    children.push(thread::spawn(move || {
-        loop
-        {
-            if stop_flag_clone_2.load(Ordering::SeqCst) {
-                break;
-            }
-
-            rundown_clone_2.wait_for_rundown();
-            rundown_clone_2.re_init();
+    children.push(thread::spawn(move || loop {
+        if stop_flag_clone_2.load(Ordering::SeqCst) {
+            break;
         }
+
+        rundown_clone_2.wait_for_rundown();
+        rundown_clone_2.re_init();
     }));
 
     thread::sleep(Duration::from_secs(10));
