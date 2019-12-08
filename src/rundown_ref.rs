@@ -186,46 +186,48 @@ impl RundownRef {
 }
 
 #[cfg(test)]
-use std::sync::Arc;
-#[cfg(test)]
-use std::thread;
+mod test {
+    use super::RundownRef;
+    use std::sync::Arc;
+    use std::thread;
 
-//-------------------------------------------------------------------
-// Test: test_wait_when_protected
-//
-// Description:
-//  Test that wait_for_rundown correctly run-down protection fails
-//
-// Notes:
-//  This test needs access to the reference count directly to work.
-//
-#[test]
-#[allow(clippy::result_unwrap_used)]
-fn test_wait_when_protected() {
-    let rundown = Arc::new(RundownRef::new());
+    //-------------------------------------------------------------------
+    // Test: test_wait_when_protected
+    //
+    // Description:
+    //  Test that wait_for_rundown correctly run-down protection fails
+    //
+    // Notes:
+    //  This test needs access to the reference count directly to work.
+    //
+    #[test]
+    #[allow(clippy::result_unwrap_used)]
+    fn wait_when_protected() {
+        let rundown = Arc::new(RundownRef::new());
 
-    // Acquire protection.
-    let guard = rundown.try_acquire().unwrap();
+        // Acquire protection.
+        let guard = rundown.try_acquire().unwrap();
 
-    // Launch a thread to wait for rundown.
-    let rundown_clone = Arc::clone(&rundown);
-    let waiter = thread::spawn(move || {
-        rundown_clone.wait_for_rundown();
-    });
+        // Launch a thread to wait for rundown.
+        let rundown_clone = Arc::clone(&rundown);
+        let waiter = thread::spawn(move || {
+            rundown_clone.wait_for_rundown();
+        });
 
-    // Spin until the rundown bit is set, one set we know
-    // that the waiter is going to wait and the signal that
-    // the drop below will send.
-    while rundown.load_flags().is_pre_rundown() {
-        thread::yield_now();
+        // Spin until the rundown bit is set, one set we know
+        // that the waiter is going to wait and the signal that
+        // the drop below will send.
+        while rundown.load_flags().is_pre_rundown() {
+            thread::yield_now();
+        }
+
+        // Release protection, the waiter should be signaled.
+        std::mem::drop(guard);
+
+        waiter.join().unwrap();
+
+        // Verify re-init works after the event is used.
+        // TODO: Split out into an independent test.
+        rundown.re_init();
     }
-
-    // Release protection, the waiter should be signaled.
-    std::mem::drop(guard);
-
-    waiter.join().unwrap();
-
-    // Verify re-init works after the event is used.
-    // TODO: Split out into an independent test.
-    rundown.re_init();
 }
