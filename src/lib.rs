@@ -72,18 +72,12 @@
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::missing_docs_in_private_items)]
 
-// Import the crates we need to use
-#[macro_use]
-extern crate bitflags;
-extern crate lazy_init;
-extern crate rsevents;
-
 mod flags;
 mod guard;
 mod rundown_ref;
-pub use guard::RundownGuard;
-pub use rundown_ref::RundownError;
-pub use rundown_ref::RundownRef;
+pub use crate::guard::RundownGuard;
+pub use crate::rundown_ref::RundownError;
+pub use crate::rundown_ref::RundownRef;
 
 extern crate doc_comment;
 

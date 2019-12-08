@@ -1,5 +1,7 @@
 // Copyright 2019 Brian Gianforcaro
 
+use bitflags::bitflags;
+
 bitflags! {
     pub struct RundownFlags: u64 {
         const RUNDOWN_IN_PROGRESS = 0xF000_0000_0000_0000;
