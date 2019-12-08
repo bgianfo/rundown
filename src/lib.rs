@@ -75,11 +75,10 @@
 mod flags;
 mod guard;
 mod rundown_ref;
+
 pub use crate::guard::RundownGuard;
 pub use crate::rundown_ref::RundownError;
 pub use crate::rundown_ref::RundownRef;
-
-extern crate doc_comment;
 
 // Test examples in the README file.
 doc_comment::doctest!("../README.md", readme_examples);
