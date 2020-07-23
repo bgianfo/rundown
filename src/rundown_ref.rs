@@ -40,13 +40,14 @@ pub struct RundownRef {
 impl RundownRef {
     /// Initializes a new [`RundownRef`].
     #[inline]
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Re-initialize this instance so it can be used again.
-    /// It is only valid to call re_init once the object is
-    /// completely run-down, via the wait_for_rundown method.
+    /// It is only valid to call `re_init` once the object is
+    /// completely run-down, via the `wait_for_rundown` method.
     ///
     /// # Important
     ///
@@ -195,13 +196,13 @@ mod test {
     // Test: test_wait_when_protected
     //
     // Description:
-    //  Test that wait_for_rundown correctly run-down protection fails
+    //  Test that `wait_for_rundown` correctly run-down protection fails
     //
     // Notes:
     //  This test needs access to the reference count directly to work.
     //
     #[test]
-    #[allow(clippy::result_unwrap_used)]
+    #[allow(clippy::unwrap_used)]
     fn wait_when_protected() {
         let rundown = Arc::new(RundownRef::new());
 
