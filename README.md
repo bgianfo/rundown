@@ -1,4 +1,4 @@
-run-down [![Build Status][gh-ci-img]][gh-ci] [![][crate-img]][crate] [![codecov][codecov-img]][codecov] [![GitHub license][license-img]][license] [![Dependabot Status][dependabot-img]][dependabot]
+run-down [![Build Status][gh-ci-img]][gh-ci] [![run-down crate][crate-img]][crate] [![codecov][codecov-img]][codecov] [![GitHub license][license-img]][license] [![Dependabot Status][dependabot-img]][dependabot]
 =====
 
 The `run-down` crate provides an implementation of run-down protection.
@@ -74,7 +74,7 @@ Note: This crate is not created by, affiliated with, or supported by Microsoft.
 [gh-ci]: https://github.com/bgianfo/pr-dash/actions
 [gh-ci-img]: https://img.shields.io/github/workflow/status/bgianfo/rust-run-down/ci/master?color=green&logo=github
 
-[license]:https://github.com/bgianfo/rust-run-down/blob/master/LICENSE
+[license]: https://github.com/bgianfo/rust-run-down/blob/master/LICENSE
 [license-img]: https://img.shields.io/github/license/bgianfo/rust-run-down.svg?color=green
 
 [dependabot]: https://dependabot.com
