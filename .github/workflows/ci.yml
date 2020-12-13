@@ -15,11 +15,8 @@ jobs:
         # The docs seem to suggest that we can have a matrix with just an
         # include directive, but it results in a "matrix must define at least
         # one vector" error in the CI system.
-        build: [pinned, stable, beta, nightly, macos, win-msvc, win-gnu]
+        build: [stable, beta, nightly, macos, win-msvc, win-gnu]
         include:
-        - build: pinned
-          os: ubuntu-latest
-          rust: 1.28.0
         - build: stable
           os: ubuntu-latest
           rust: stable
@@ -83,7 +80,7 @@ jobs:
     - name: Check formatting
       run: cargo fmt -- --check
 
-    - name: Check formatting
+    - name: Check Clippy
       run: cargo clippy
 
     - name: Install Cargo Audit
@@ -92,7 +89,7 @@ jobs:
         crate: cargo-audit
         version: latest
 
-    - name: Check audit
+    - name: Check Audit
       run: cargo audit
 
   coverage:
