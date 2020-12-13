@@ -82,6 +82,7 @@ jobs:
       with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --all-features --all-targets -- -D warnings
+          name: "Code Checkers: Clippy Results"
 
     - name: Check formatting
       run: cargo fmt -- --check
