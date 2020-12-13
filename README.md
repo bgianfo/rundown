@@ -84,7 +84,7 @@ Note: This crate is not created by, affiliated with, or supported by Microsoft.
 [crate-img]:http://meritbadge.herokuapp.com/run-down
 
 [codecov]: https://codecov.io/gh/bgianfo/rust-run-down
-[codecov-img]:https://codecov.io/gh/bgianfo/rust-run-down/branch/master/graph/badge.svg
+[codecov-img]: https://img.shields.io/codecov/c/github/bgianfo/rust-run-down/master?logo=codecov&color=green
 
 [nt-run-down-docs]: https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/run-down-protection
 
