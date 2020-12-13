@@ -77,20 +77,19 @@ jobs:
         profile: minimal
         components: rustfmt, clippy
 
+    - name: Check Clippy
+      uses: actions-rs/clippy-check@v1
+      with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-features
+
     - name: Check formatting
       run: cargo fmt -- --check
 
-    - name: Check Clippy
-      run: cargo clippy
-
-    - name: Install Cargo Audit
-      uses: actions-rs/install@v0.1
+    - name: Audit Crates
+      uses: actions-rs/audit-check@v1
       with:
-        crate: cargo-audit
-        version: latest
-
-    - name: Check Audit
-      run: cargo audit
+        token: ${{ secrets.GITHUB_TOKEN }}
 
   coverage:
     name: Code Coverage
