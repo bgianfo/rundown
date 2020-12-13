@@ -55,17 +55,10 @@
 //! [nt-run-down-docs]: https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/run-down-protection
 //! [smp-link]: https://en.wikipedia.org/wiki/Symmetric_multiprocessing
 
-// Force "Allow" lints to be warnings.
+// Force "Allow" lints to be warnings, then re-disable specific warnings, for
+// issues we don't necessarily care about for this project.
 //
-#![warn(
-    clippy::all,
-    clippy::pedantic,
-    clippy::nursery,
-    clippy::cargo
-)]
-
-// Re-Disable specific warnings, for things we don't care about.
-//
+#![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 #![allow(clippy::module_name_repetitions)]
 
 mod flags;
