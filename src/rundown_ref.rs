@@ -132,7 +132,7 @@ impl RundownRef {
 
     /// Blocks thread execution until there are no outstanding reference
     /// counts taken on the [`RundownRef`], and the internal representation
-    /// has been marked with as RUNDOWN_IN_PROGRESS to signal
+    /// has been marked with as 'rundown in progress' to signal
     /// that no other thread can safely acquire a reference count afterwards.
     ///
     /// # Important
