@@ -59,8 +59,8 @@ jobs:
     - name: Tests
       run: cargo test --verbose
 
-  checkers:
-    name: Code Checkers
+  linters:
+    name: Code Linters
     runs-on: ubuntu-18.04
     steps:
 
@@ -82,7 +82,7 @@ jobs:
       with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --all-features --all-targets -- -D warnings
-          name: "Code Checkers: Clippy Results"
+          name: "Code Linters: Clippy Results"
 
     - name: Check formatting
       run: cargo fmt -- --check
@@ -93,7 +93,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
 
   coverage:
-    name: Code Coverage
+    name: Code Coverage Collection
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
