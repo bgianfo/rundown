@@ -81,7 +81,7 @@ Note: This crate is not created by, affiliated with, or supported by Microsoft.
 [dependabot-img]: https://img.shields.io/static/v1?label=dependabot&message=enabled&color=green&logo=dependabot
 
 [crate]: https://crates.io/crates/run-down
-[crate-img]:http://meritbadge.herokuapp.com/run-down
+[crate-img]: https://img.shields.io/crates/v/run-down?color=green&logo=rust
 
 [codecov]: https://codecov.io/gh/bgianfo/rust-run-down
 [codecov-img]: https://img.shields.io/codecov/c/github/bgianfo/rust-run-down/master?logo=codecov&color=green
