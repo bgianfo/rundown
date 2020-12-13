@@ -86,6 +86,11 @@ impl RundownRef {
     /// Attempts to acquire rundown protection on this [`RundownRef`],
     /// returns the [`RundownGuard`] which holds the reference count,
     /// or returns an error if the object is already being rundown.
+    ///
+    /// # Errors
+    ///
+    /// Will return `Err` if the rundown is already in progress on the object.
+    ///
     pub fn try_acquire(&self) -> Result<RundownGuard<'_>, RundownError> {
         let mut current = self.load_flags();
 
