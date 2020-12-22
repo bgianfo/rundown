@@ -70,4 +70,5 @@ pub use crate::rundown_ref::RundownError;
 pub use crate::rundown_ref::RundownRef;
 
 // Test examples in the README file.
+#[cfg(doctest)]
 doc_comment::doctest!("../README.md", readme_examples);
