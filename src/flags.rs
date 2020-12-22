@@ -79,6 +79,7 @@ pub const fn to_flags(bits: u64) -> RundownFlags {
 #[cfg(test)]
 mod test {
     use super::{to_flags, RundownFlags};
+    use pretty_assertions::assert_eq;
 
     //-------------------------------------------------------------------
     // Test: test_rundown_flags_refcount
@@ -165,6 +166,38 @@ mod test {
     fn test_rundown_flags_underflow_panic() {
         let flags = RundownFlags::empty();
         flags.dec_ref();
+    }
+
+    //-------------------------------------------------------------------
+    // Test: test_add_ref
+    //
+    // Description:
+    //  A test case to validate that `add_ref` works as expected.
+    //
+    #[test]
+    fn test_add_ref() {
+        let mut flags = RundownFlags::empty();
+        flags = to_flags(flags.add_ref());
+
+        assert_eq!(1, flags.get_ref());
+        assert!(!flags.is_ref_zero());
+        assert!(flags.is_ref_active());
+    }
+
+    //-------------------------------------------------------------------
+    // Test: test_dec_ref
+    //
+    // Description:
+    //  A test case to validate that `dec_ref` works as expected.
+    //
+    #[test]
+    fn test_def_ref() {
+        let mut flags = to_flags(0x1);
+        flags = to_flags(flags.dec_ref());
+
+        assert_eq!(0, flags.get_ref());
+        assert!(flags.is_ref_zero());
+        assert!(!flags.is_ref_active());
     }
 
     //-------------------------------------------------------------------
