@@ -7,8 +7,8 @@
 //! and the ability to wait for all outstanding usages to drain so you can safely perform the required operation.
 //!
 //! This crate was inspired by the [run-down protection primitive in the NT kernel][nt-run-down-docs].
-//! Where it's used in situations such as driver unload, where futher access to the driver
-//! needs to be rejected and the unloading thread must wait for inflight acesss to stop before
+//! Where it's used in situations such as driver unload, where further access to the driver
+//! needs to be rejected and the unloading thread must wait for in-flight access to stop before
 //! the driver can be completely unload.
 //!
 //! # Example

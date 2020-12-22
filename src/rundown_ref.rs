@@ -45,16 +45,15 @@ impl RundownRef {
         Self::default()
     }
 
-    /// Re-initialize this instance so it can be used again.
-    /// It is only valid to call `re_init` once the object is
-    /// completely run-down, via the `wait_for_rundown` method.
+    /// Re-initialize this instance so it can be used again. It is only valid
+    /// to call `re_init` once the object is completely run-down, via the
+    /// `wait_for_rundown` method.
     ///
     /// # Important
     ///
-    /// The moment this method returns, new rundown protection
-    /// requests can succeed. You must perform all re-initialization
-    /// of the shared object the run-down protection is guarding
-    /// before you call this method.
+    /// The moment this method returns, new rundown protection requests can
+    /// succeed. You must perform all re-initialization of the shared object
+    /// the run-down protection is guarding before you call this method.
     pub fn re_init(&self) {
         let current = self.load_flags();
 
@@ -83,9 +82,9 @@ impl RundownRef {
         self.ref_count.store(0, Ordering::Release);
     }
 
-    /// Attempts to acquire rundown protection on this [`RundownRef`],
-    /// returns the [`RundownGuard`] which holds the reference count,
-    /// or returns an error if the object is already being rundown.
+    /// Attempts to acquire rundown protection on this [`RundownRef`], returns
+    /// the [`RundownGuard`] which holds the reference count, or returns an
+    /// error if the object is already being rundown.
     ///
     /// # Errors
     ///
