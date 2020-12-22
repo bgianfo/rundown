@@ -185,8 +185,10 @@ impl RundownRef {
     /// Readability wrapper around atomic compare exchange.
     #[inline]
     fn compare_exchange(&self, current: u64, new: u64) -> Result<u64, u64> {
+        let success_ord = Ordering::Acquire;
+        let failure_ord = Ordering::Relaxed;
         self.ref_count
-            .compare_exchange(current, new, Ordering::Acquire, Ordering::Relaxed)
+            .compare_exchange(current, new, success_ord, failure_ord)
     }
 }
 
