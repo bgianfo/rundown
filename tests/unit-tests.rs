@@ -14,7 +14,7 @@ use std::{sync::atomic::AtomicBool, sync::atomic::Ordering};
 //  Test that RundownGuard implements Drop.
 //
 #[test]
-#[allow(clippy::drop_bounds)]
+#[allow(drop_bounds)]
 fn test_rundown_guard_implements_drop() {
     // Test via compilation.
     fn is_droppable<T: Drop>() {}
